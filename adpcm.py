@@ -1,6 +1,3 @@
-import struct
-import wave
-
 ima_index_table = [
   -1, -1, -1, -1, 2, 4, 6, 8,
   -1, -1, -1, -1, 2, 4, 6, 8
@@ -17,29 +14,6 @@ ima_step_table = [
   5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
   15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 ]
-
-
-def audio_reader():
-    with wave.open("input.wav", "rb") as w:
-        samples = []
-        print(w.getparams())
-        # for i in range(10):
-        while True:
-            samp = w.readframes(1)
-            try:
-                samples.append(struct.unpack("<h", samp)[0])
-            except struct.error:
-                break
-        return samples
-
-
-def audio_writer(samples, title):
-    with wave.open(title, "wb") as w:
-        w.setnchannels(1)
-        w.setsampwidth(2)
-        w.setframerate(44100)
-        for samp in samples:
-            w.writeframesraw(struct.pack("<h", samp))
 
 
 def encoder(samples):
@@ -115,10 +89,7 @@ def decoder(samples):
     decoded_samples = []
     _decoder_prevsample = 0
     _decoder_previndex = 0
-    for i, sample in enumerate(samples):
-        if (i % 50000) == 0:
-            # Packet loss simulation
-            continue
+    for sample in samples:
         _decoder_prevsample, _decoder_previndex = _decoder(sample, _decoder_prevsample, _decoder_previndex)
         decoded_samples.append(_decoder_prevsample)
     return decoded_samples
@@ -162,10 +133,3 @@ def _decoder(code, prevsample, previndex):
         index = 88
 
     return predsample, index
-
-
-if __name__ == "__main__":
-    _samples = audio_reader()
-    encoded = encoder(_samples)
-    decoded = decoder(encoded)
-    audio_writer(decoded, "output.wav")
