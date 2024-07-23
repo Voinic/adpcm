@@ -1,0 +1,8 @@
+{
+    "urls": [
+      ["adpcm.py", "github:Voinic/adpcm/adpcm.py"]
+    ],
+    "deps": [
+    ],
+    "version": "0.1"
+}
